@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -16,6 +17,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _groundCheckRadius = 0.1f;
     [SerializeField] private LayerMask _groundLayer;
 
+    private float _moveX;
+    private float _moveY;
+
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -25,9 +29,9 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         // Horizontal and vertical input
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical"); // Up = float
-        _moveInput = new Vector2(moveX, moveY).normalized;
+        _moveX = Input.GetAxisRaw("Horizontal");
+        _moveY = Input.GetAxisRaw("Vertical"); // Up = float
+        _moveInput = new Vector2(_moveX, _moveY).normalized;
 
         // Ground check
         _isGrounded = Physics2D.OverlapCircle(_groundCheck.position, _groundCheckRadius, _groundLayer);
@@ -37,8 +41,24 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleMovement();
         ApplyGravity();
+        HandleRotation();
     }
 
+    private void HandleRotation()
+    {
+        Vector3 scale = transform.localScale;
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        if (mousePosition.x > transform.position.x)
+        {
+            scale.x = Mathf.Abs(scale.x); // Face right
+        }
+        else if (mousePosition.x < transform.position.x)
+        {
+            scale.x = -Mathf.Abs(scale.x); // Face left
+        }
+        transform.localScale = scale;
+    }
     private void HandleMovement()
     {
         // Horizontal movement
@@ -65,4 +85,6 @@ public class PlayerMovement : MonoBehaviour
             _rb.velocity = new Vector2(_rb.velocity.x, newVelY);
         }
     }
+
+
 }
