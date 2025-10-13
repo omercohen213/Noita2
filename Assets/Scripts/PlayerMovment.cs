@@ -36,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         HandleMovement();
+        HandleRotation();
         ApplyGravity();
     }
 
@@ -54,6 +55,22 @@ public class PlayerMovement : MonoBehaviour
         }
 
         _rb.velocity = new Vector2(newVelX, newVelY);
+    }
+
+    private void HandleRotation()
+    {
+        Vector3 scale = transform.localScale;
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        if (mousePosition.x > transform.position.x)
+        {
+            scale.x = Mathf.Abs(scale.x); // Face right
+        }
+        else if (mousePosition.x < transform.position.x)
+        {
+            scale.x = -Mathf.Abs(scale.x); // Face left
+        }
+        transform.localScale = scale;
     }
 
     private void ApplyGravity()
